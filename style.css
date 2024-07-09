@@ -1,0 +1,16 @@
+.headline{
+   margin-top: 2em;
+   display : flex;
+   justify-content: center;
+}
+
+.headline svg{
+  width : 450px
+}
+
+
+.menus{
+  margin-top: 1em;
+  display : flex;
+  justify-content: center;
+}
