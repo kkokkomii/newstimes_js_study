@@ -11,8 +11,8 @@ let newsList = [];
 
 
 const getLatesNews = async () =>{
-  // const url = new URL(`https://study-website-be-bbb1539aa813.herokuapp.com/top-headlines?country=kr&pageSize=${PAGE_SIZE}`);
-  const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${api_Key}`);
+  const url = new URL(`https://study-website-be-bbb1539aa813.herokuapp.com/top-headlines?country=us`);
+  // const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${api_Key}`);
   const response = await fetch(url)
   const data = await response.json()
   newsList = data.articles;
@@ -21,8 +21,8 @@ const getLatesNews = async () =>{
 
 const getNewsKeyword = async () => {
   const keyword = document.getElementById("search-input").value;
-  // const url = new URL(`https://study-website-be-bbb1539aa813.herokuapp.com/top-headlines?country=kr&pageSize=${PAGE_SIZE}`);
-  const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&q=${keyword}&apiKey=${api_Key}`);
+  const url = new URL(`https://study-website-be-bbb1539aa813.herokuapp.com/top-headlines?country=us&q=${keyword}`);
+  // const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&q=${keyword}&apiKey=${api_Key}`);
   const response = await fetch(url)
   const data = await response.json()
   newsList = data.articles;
@@ -34,8 +34,8 @@ const getNewsKeyword = async () => {
 const getnewsByCategory = async (event) => {
   const category = event.target.textContent.toLowerCase();
   console.log(`category+ ${category}`);
-  // const url = new URL(`https://study-website-be-bbb1539aa813.herokuapp.com/top-headlines?country=kr&pageSize=${PAGE_SIZE}`);
-  const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${api_Key}`);
+  const url = new URL(`https://study-website-be-bbb1539aa813.herokuapp.com/top-headlines?country=us&category=${category}`);
+  // const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${api_Key}`);
   const response = await fetch(url)
   const data = await response.json()
   newsList = data.articles;
