@@ -2,7 +2,6 @@
 // 2. 버튼의 카테고리별 뉴스를 가져오기
 // 3. 그 뉴스를 보여줘야함(render())
 const menus = document.querySelectorAll(".menus button")
-console.log(menus)
 menus.forEach(element => element.addEventListener("click", (event)=>getnewsByCategory(event))) // 각각의 메뉴 element에 eventlistner를 더해줌
 
 const api_Key= `c9f80cc1bb6145e595b972698153921b`
@@ -40,6 +39,8 @@ const getnewsByCategory = async (event) => {
   const data = await response.json()
   newsList = data.articles;
   render();
+  console.log("category", newsList )
+
 }
 
 
