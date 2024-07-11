@@ -95,3 +95,13 @@
     }
 
   }
+
+  .noResult{
+    display: flex;
+    justify-content: center;
+    margin : auto;
+  }
+
+  .col-lg-8{
+    cursor : pointer;
+  }

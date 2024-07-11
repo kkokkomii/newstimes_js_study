@@ -20,14 +20,29 @@ const getLatesNews = async () =>{
   render();
 }
 
+
+//엔터키로 검색 키워드 입력
+const keyword_enter = document.getElementById("search-input");
+keyword_enter.addEventListener("keydown", function (event) {
+  if (event.keyCode === 13) {
+    getNewsKeyword();}
+  })
+
 const getNewsKeyword = async () => {
   const keyword = document.getElementById("search-input").value;
+
+  if(keyword.length===0 || keyword==="" || keyword === " "){
+    alert("검색 키워드를 입력해주세요!"); 
+    return;
+  } // 검색 키워드를 입력하지 않으면 alert가 뜸
   const url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=us&q=${keyword}`);
   // const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&q=${keyword}&apiKey=${api_Key}`);
   const response = await fetch(url)
   const data = await response.json()
   newsList = data.articles;
   render();
+
+  keyword_enter.value = ""; // 검색 키워드 엔터치고 나면 입력창 비워둠
 
   console.log("keyword", newsList )
 }
@@ -47,27 +62,45 @@ const getnewsByCategory = async (event) => {
 
 
 const render=()=>{
-  const newsHTML = newsList.map(item=>`<div class = "row news">
-          <div class = "col-lg-4">
-            <img
-              class="news-ima-size"
-              src=${item.urlToImage} 
-              onerror="this.src='https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo-available_87543-11093.jpg'"
-            />
-          </div>
-          <div class = "col-lg-8">
-            <h2>${item.title}</h2>
-            <p>
-            ${item.description == null || item.description == "" ? "내용없음" : item.description.length > 200 ? item.description.substring(0, 200) + "..." : item.description}
-            </p>
-            <div>${item.source.name == null || item.source.name == "" ? "출처없음" : item.source.name}, ${moment(item.publishedAt).fromNow()}</div>
-          </div>
-        </div>`)
+  // 만약 찾는 검색어가 없으면 검색결과가 없다는 이미지가 나옴
+  if(newsList.length===0){
+    const newsHTML = `<div>
+      <img class = "noResult" src="https://www.turista.co.kr/images/user/nodata.png" />
+    </div>`
+    document.getElementById('newsboard').innerHTML = newsHTML;
+    console.log("none")
+
+  }else{
+    const newsHTML = newsList.map(item=>`<div class = "row news">
+            <div class = "col-lg-4">
+              <img
+                class="news-ima-size"
+                src=${item.urlToImage} 
+                onerror="this.src='https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo-available_87543-11093.jpg'"
+              />
+            </div>
+            <div class = "col-lg-8">
+              <h2 id = "title" onClick="location.href='${item.url}'">${item.title}</h2>
+              <p id = "description" onClick="location.href='${item.url}'">
+              ${item.description == null || item.description == "" ? "내용없음" : item.description.length > 200 ? item.description.substring(0, 200) + "..." : item.description}
+              </p>
+              <div>${item.source.name == null || item.source.name == "" ? "출처없음" : item.source.name}, ${moment(item.publishedAt).fromNow()}</div>
+            </div>
+          </div>`)
+          document.getElementById('newsboard').innerHTML = newsHTML.join(''); // news 사이에 존재하는 ','를 없애기 위해서 join()을 사용함
+        }
+
   //내용없음 표시 or 200장 이상일때 ... 으로 줄이는 부분은 조건부 연산자(물음표 연산자) 사용
 
-  document.getElementById('newsboard').innerHTML = newsHTML.join(''); // news 사이에 존재하는 ','를 없애기 위해서 join()을 사용함
+  
 }
 
+// const connectLink = () => {
+//   const description = document.getElementById("title");
+
+//   description.addEventListener("click", function (event) {
+
+// }
 
 const openNav = () => {
   document.getElementById("mySidenav").style.width = "250px";
