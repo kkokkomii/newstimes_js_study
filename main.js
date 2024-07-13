@@ -7,17 +7,22 @@ menus.forEach(element => element.addEventListener("click", (event)=>getnewsByCat
 menus_side.forEach(element => element.addEventListener("click", (event)=>getnewsByCategory(event))) // 각각의 메뉴 element에 eventlistner를 더해줌
 
 const api_Key= `c9f80cc1bb6145e595b972698153921b`
-let PAGE_SIZE = 10;
+let page = 1;
+const groupSize = 5;
+const pageSize = 10;
+
 let newsList = [];
 
-
 const getLatesNews = async () =>{
+
   const url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=us`);
   // const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${api_Key}`);
   const response = await fetch(url)
   const data = await response.json()
   newsList = data.articles;
   render();
+  paginationRender();
+
 }
 
 
@@ -31,14 +36,22 @@ keyword_enter.addEventListener("keydown", function (event) {
 
 let url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?`);
 
+let totalResults = 0
+
 const getNews = async()=> {
   try{
+    url.searchParams.set("page", page) // url에서 &page=page 이렇게 입력해준것과 같음
+    url.searchParams.set("pageSize", pageSize)
     const response = await fetch(url)
+    console.log("ddd", response)
     const data = await response.json()
     if(response.status === 200){
       newsList = data.articles;
+      totalResults = data.totalResults
       console.log(newsList)
       render();
+      paginationRender();
+
     }else{
       throw new Error(data.message)
     }
@@ -70,11 +83,6 @@ const getnewsByCategory = async (event) => {
 
 }
 
-// const catchError = ()=> {
-//   try{
-//     newsList.map
-//   }
-// }
 const render=()=>{
   // 만약 찾는 검색어가 없으면 검색결과가 없다는 이미지가 나옴
   if(newsList.length===0){
@@ -114,6 +122,34 @@ const errorRender = (errorMassage)=> {
   document.getElementById("news-borad").innerHTML = errorHTML;
 }
 
+const paginationRender= ()=>{
+  //gageGroup
+  const pageGroup = Math.ceil(page/groupSize);
+  //lastPage
+  const lastPage = pageGroup*groupSize;
+  //firstPage
+  const firstPage = lastPage - (groupSize -1);
+//   <nav aria-label="Page navigation example">
+//   <ul class="pagination">
+//     <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+//     <li class="page-item"><a class="page-link" href="#">1</a></li>
+//     <li class="page-item"><a class="page-link" href="#">2</a></li>
+//     <li class="page-item"><a class="page-link" href="#">3</a></li>
+//     <li class="page-item"><a class="page-link" href="#">Next</a></li>
+//   </ul>
+// </nav>
+  let paginationHTML = ``
+  for(let i = firstPage; i<=lastPage ; i++){
+    paginationHTML += `<li class="page-item" onclick = "movetoPage(${i})"><a class="page-link">${i}</a></li>`
+  }
+  document.querySelector(".pagination").innerHTML = paginationHTML
+}
+
+const movetoPage = async (pageNum) =>{
+  page = pageNum;
+  await getNews();
+}
+
 
 const openNav = () => {
   document.getElementById("mySidenav").style.width = "250px";
@@ -131,4 +167,5 @@ const openSearchBox = () => {
     inputArea.style.display = "inline";
   }
 };
+
 getLatesNews();
