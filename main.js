@@ -7,44 +7,26 @@ menus.forEach(element => element.addEventListener("click", (event)=>getnewsByCat
 menus_side.forEach(element => element.addEventListener("click", (event)=>getnewsByCategory(event))) // 각각의 메뉴 element에 eventlistner를 더해줌
 
 const api_Key= `c9f80cc1bb6145e595b972698153921b`
-let page = 1;
 const groupSize = 5;
 const pageSize = 10;
-
+let page = 1;
 let newsList = [];
-
-const getLatesNews = async () =>{
-
-  const url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=us`);
-  // const url = new URL(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${api_Key}`);
-  const response = await fetch(url)
-  const data = await response.json()
-  newsList = data.articles;
-  render();
-  paginationRender();
-
-}
-
-
-
-//엔터키로 검색 키워드 입력
-const keyword_enter = document.getElementById("search-input");
-keyword_enter.addEventListener("keydown", function (event) {
-  if (event.keyCode === 13) {
-    getNewsKeyword();}
-  })
-
 let url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?`);
-
+// let url = new URL(`https://newsapi.org/v2/top-headlines?country=us&apiKey=${api_Key}`);
 let totalResults = 0
 
+
+// 전체 뉴스를 보여주는 함수
+//getNews는 getNewsKeyword와 getnewsByCategory가 실행될 때 실행됨
 const getNews = async()=> {
   try{
     url.searchParams.set("page", page) // url에서 &page=page 이렇게 입력해준것과 같음
-    url.searchParams.set("pageSize", pageSize)
+    url.searchParams.set("pageSize", pageSize) // url에 페이지 사이즈 정보도 넘겨줌
     const response = await fetch(url)
-    console.log("ddd", response)
     const data = await response.json()
+    console.log("rrr", response)
+    console.log("ddd", data)
+
     if(response.status === 200){
       newsList = data.articles;
       totalResults = data.totalResults
@@ -62,27 +44,30 @@ const getNews = async()=> {
 
 }
 
+// 키워드 검색 후, 결과 알려줌
 const getNewsKeyword = async () => {
   const keyword = document.getElementById("search-input").value;
   if(keyword.length===0 || keyword==="" || keyword === " "){
     alert("검색 키워드를 입력해주세요!"); 
     return;
   } // 검색 키워드를 입력하지 않으면 alert가 뜸
-  url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=us&q=${keyword}`);
+  url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?q=${keyword}`);
   // url = new URL(`https://newsapi.org/v2/top-headlines?country=us&q=${keyword}&apiKey=${api_Key}`);
   await getNews();
 
-  keyword_enter.value = ""; // 검색 키워드 엔터치고 나면 입력창 비워둠
+  keyword.value = ""; // 검색 키워드 엔터치고 나면 입력창 비워둠
 }
 
 const getnewsByCategory = async (event) => {
   const category = event.target.textContent.toLowerCase();
-  url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=us&category=${category}`);
+  console.log(category)
+  url = new URL(`https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?category=${category}`);
   // url = new URL(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${api_Key}`);
   await getNews();
 
 }
 
+// 뉴스를 렌더링해주는 함수
 const render=()=>{
   // 만약 찾는 검색어가 없으면 검색결과가 없다는 이미지가 나옴
   if(newsList.length===0){
@@ -119,37 +104,66 @@ const render=()=>{
 
 const errorRender = (errorMassage)=> {
   const errorHTML =  `<div class="alert alert-danger" role="alert">  ${errorMassage} </div>`
-  document.getElementById("news-borad").innerHTML = errorHTML;
+  document.getElementById("newsboard").innerHTML = errorHTML;
 }
 
 const paginationRender= ()=>{
   //gageGroup
+  const totalPages = Math.ceil(totalResults/pageSize);
   const pageGroup = Math.ceil(page/groupSize);
   //lastPage
-  const lastPage = pageGroup*groupSize;
-  //firstPage
-  const firstPage = lastPage - (groupSize -1);
-//   <nav aria-label="Page navigation example">
-//   <ul class="pagination">
-//     <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-//     <li class="page-item"><a class="page-link" href="#">1</a></li>
-//     <li class="page-item"><a class="page-link" href="#">2</a></li>
-//     <li class="page-item"><a class="page-link" href="#">3</a></li>
-//     <li class="page-item"><a class="page-link" href="#">Next</a></li>
-//   </ul>
-// </nav>
-  let paginationHTML = ``
-  for(let i = firstPage; i<=lastPage ; i++){
-    paginationHTML += `<li class="page-item" onclick = "movetoPage(${i})"><a class="page-link">${i}</a></li>`
+  const lastPage = pageGroup*groupSize; // 마지막 페이지 = 그룹 사이즈
+  if(lastPage >totalPages){
+    lastPage = totalPages;
   }
+  console.log("ttt",totalPages)
+  console.log("lll",lastPage)
+  //firstPage
+  // const firstPage = lastPage - (groupSize -1) <= 0 ? 1:lastPage - (groupSize -1);
+
+  let last = pageGroup * 5;
+  if (last > totalPages) {
+    // 마지막 그룹이 5개 이하이면
+    last = totalPages;
+  }
+  let firstPage = last - 4 <= 0 ? 1 : last - 4; // 첫그룹이 5이하이면
+
+
+  let paginationHTML = ``
+  if(page>1){  
+    paginationHTML =  `<li class="page-item" onclick="movetoPage(1)"> <a class="page-link" href='#js-bottom'>&lt;&lt;</a>
+                      </li>
+                      <li class="page-item" onclick="movetoPage(${page - 1})">
+                        <a class="page-link" href='#js-bottom'>&lt;</a>
+                      </li>`}
+  for(let i = firstPage; i<=lastPage ; i++){
+    paginationHTML += `<li class="page-item ${i===page?"active":""}" onclick = "movetoPage(${i})"><a class="page-link">${i}</a></li>`
+  }
+ if(page<totalPages){
+    paginationHTML +=  `<li class="page-item" onclick="movetoPage(${page + 1})">
+                        <a  class="page-link" href='#js-program-detail-bottom'>&gt;</a>
+                       </li>
+                       <li class="page-item" onclick="movetoPage(${totalPages})">
+                        <a class="page-link" href='#js-bottom'>&gt;&gt;</a>
+                       </li>`}
+
   document.querySelector(".pagination").innerHTML = paginationHTML
 }
 
+
+// html에서 페이지 넘버를 받아서 url로 넘겨주는 함수
 const movetoPage = async (pageNum) =>{
   page = pageNum;
   await getNews();
 }
 
+
+//엔터키로 검색 키워드 입력
+const keyword_enter = document.getElementById("search-input");
+keyword_enter.addEventListener("keydown", function (event) {
+  if (event.keyCode === 13) {
+    getNewsKeyword();}
+  })
 
 const openNav = () => {
   document.getElementById("mySidenav").style.width = "250px";
@@ -168,4 +182,4 @@ const openSearchBox = () => {
   }
 };
 
-getLatesNews();
+getNews();
