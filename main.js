@@ -52,6 +52,7 @@ const getLatesNews = async () =>{
 
 // 키워드 검색 후, 결과 알려줌
 const getNewsKeyword = async () => {
+  page=1;
   const keyword = document.getElementById("search-input").value;
   if(keyword.length===0 || keyword==="" || keyword === " "){
     alert("검색 키워드를 입력해주세요!"); 
