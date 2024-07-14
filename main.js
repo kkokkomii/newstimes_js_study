@@ -121,11 +121,9 @@ const errorRender = (errorMassage)=> {
 }
 
 const paginationRender= ()=>{
-  //gageGroup
   const totalPages = Math.ceil(totalResults/pageSize);
   const pageGroup = Math.ceil(page/groupSize);
-  //lastPage
-  const lastPage = pageGroup*groupSize; // 마지막 페이지 = 그룹 사이즈
+  let lastPage = pageGroup*groupSize; // 마지막 페이지 = 그룹 사이즈
   if (lastPage > totalPages) {
     lastPage = totalPages;
   }

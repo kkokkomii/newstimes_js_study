@@ -105,3 +105,10 @@
   .col-lg-8{
     cursor : pointer;
   }
+
+  .pagination {
+    justify-content: center;
+    margin-top: 1em;
+
+  }
+  
